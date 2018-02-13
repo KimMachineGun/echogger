@@ -36,11 +36,11 @@ func StartWithConfig(e *echo.Echo, address string, config SwaggerConfig) error {
 
 	specDoc, err := loads.Spec(config.DocPath)
 	if err != nil {
-		return err
+		panic(err)
 	}
 	b, err := json.MarshalIndent(specDoc.Spec(), "", "	")
 	if err != nil {
-		return err
+		panic(err)
 	}
 
 	basePath := config.BasePath
@@ -51,15 +51,15 @@ func StartWithConfig(e *echo.Echo, address string, config SwaggerConfig) error {
 	jsonName := config.JSONName
 	if jsonName == "" {
 		jsonName = "swagger.json"
-	} else if path.Ext(jsonName) == ".json" {
-		return errors.New("JsonName must have .json extension.")
+	} else if path.Ext(jsonName) != ".json" {
+		panic(errors.New("JsonName must have .json extension."))
 	}
 
 	flavor := config.Flavor
 	if flavor == "" {
 		flavor = "redoc"
 	} else if flavor != "redoc" && flavor != "swagger" {
-		return errors.New("Flavor must be redoc or swagger.")
+		panic(errors.New("Flavor must be redoc or swagger."))
 	}
 
 	subPath := config.SubPath
