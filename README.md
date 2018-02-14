@@ -1,8 +1,5 @@
 # echogger
-Easy Swagger UI for your Echo API
-
-## Require
-- [golang/dep](https://github.com/golang/dep)
+Easy Swagger UI for your [Echo](https://echo.labstack.com/) API
 
 ## Installation
 If you want to install echogger. 
@@ -22,7 +19,6 @@ src
      └── swagger.yml
      
 ```
-Echogger need other libraries. So you need to install them with `dep ensure`  
 
 ## Example
 ```
@@ -32,6 +28,7 @@ import (
 	"net/http"
 
 	"github.com/DEATH-TROOPER/echogger"
+
 	"github.com/labstack/echo"
 )
 
@@ -40,25 +37,29 @@ const PORT = "8080"
 func main() {
 	e := echo.New()
 
+	config := echogger.Config{
+		Flavor:   "swagger",
+		BasePath: "v1",
+		SubPath:  "document",
+		DocPath:  "./swagger.yml",
+		JSONName: "spec.json",
+	}
+
+	e.Use(echogger.MiddlewareWithConfig(config))
+
 	e.GET("/", func(c echo.Context) error {
 		return c.String(http.StatusOK, "Hello world")
 	})
 
-	config := echogger.SwaggerConfig{
-		Flavor:   "swagger",
-		BasePath: "v1",
-		SubPath:  "docs",
-		DocPath:  "./swagger.yml",
-	}
-
-	echogger.StartWithConfig(e, ":"+PORT, config)
+	e.Start(":" + PORT)
 }
-```
-If you use `echogger.Start()`, config is default value.  
 
-### Default
+```
+If you use `echogger.Middleware()`, config is default value.  
+
+> ### Default Value
 >```
->Flavor:   "redoc"
+>Flavor:   "swagger"
 >BasePath: "/"
 >SubPath:  "docs"
 >DocPath:  "./swagger.yml"

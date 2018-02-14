@@ -15,7 +15,7 @@ import (
 )
 
 type (
-	SwaggerConfig struct {
+	Config struct {
 		DocPath  string
 		BasePath string
 		Flavor   string
@@ -25,59 +25,31 @@ type (
 	}
 )
 
-func Start(e *echo.Echo, address string) error {
-	return StartWithConfig(e, address, SwaggerConfig{})
+func Middleware() echo.MiddlewareFunc {
+	return MiddlewareWithConfig(Config{})
 }
 
-func StartWithConfig(e *echo.Echo, address string, config SwaggerConfig) error {
-	if config.DocPath == "" {
-		config.DocPath = "./swagger.yml"
-	}
+func MiddlewareWithConfig(config Config) echo.MiddlewareFunc {
+	config.EnsureDefaults()
 
 	specDoc, err := loads.Spec(config.DocPath)
 	if err != nil {
 		panic(err)
 	}
+
 	b, err := json.MarshalIndent(specDoc.Spec(), "", "	")
 	if err != nil {
 		panic(err)
 	}
 
-	basePath := config.BasePath
-	if basePath == "" || !path.IsAbs(basePath) {
-		basePath = "/" + basePath
-	}
-
-	jsonName := config.JSONName
-	if jsonName == "" {
-		jsonName = "swagger.json"
-	} else if path.Ext(jsonName) != ".json" {
-		panic(errors.New("JsonName must have .json extension."))
-	}
-
-	flavor := config.Flavor
-	if flavor == "" {
-		flavor = "redoc"
-	} else if flavor != "redoc" && flavor != "swagger" {
-		panic(errors.New("Flavor must be redoc or swagger."))
-	}
-
-	subPath := config.SubPath
-	if subPath == "" {
-		subPath = "docs"
-	}
-
-	e.GET(path.Join(config.BasePath, jsonName), func(c echo.Context) error {
-		c.Response().Header().Set("Access-Control-Allow-Origin", "*")
-		return c.String(http.StatusOK, string(b))
-	})
+	html := ""
 
 	if !config.NoUI {
-		if flavor == "redoc" {
+		if config.Flavor == "redoc" {
 			redocOpts := redocmiddleware.RedocOpts{
-				BasePath: basePath,
-				SpecURL:  path.Join(basePath, jsonName),
-				Path:     subPath,
+				BasePath: config.BasePath,
+				SpecURL:  path.Join(config.BasePath, config.JSONName),
+				Path:     config.SubPath,
 			}
 
 			redocOpts.EnsureDefaults()
@@ -86,30 +58,60 @@ func StartWithConfig(e *echo.Echo, address string, config SwaggerConfig) error {
 
 			buf := bytes.NewBuffer(nil)
 			_ = tmpl.Execute(buf, redocOpts)
-			html := buf.String()
-
-			e.GET(path.Join(basePath, subPath), func(c echo.Context) error {
-				return c.HTML(http.StatusOK, html)
-			})
+			html = buf.String()
 		} else {
-			tmpl := template.Must(template.New("redoc").Parse(swaggerTemplate))
-
 			swaggerOpts := map[string]interface{}{
-				"SpecURL":  path.Join(basePath, jsonName),
+				"SpecURL":  path.Join(config.BasePath, config.JSONName),
 				"CSS":      swaggerCSS,
 				"BundleJS": swaggerBundleJS,
 				"PresetJS": swaggerPreset,
 			}
 
+			tmpl := template.Must(template.New("swagger").Parse(swaggerTemplate))
+
 			buf := bytes.NewBuffer(nil)
 			_ = tmpl.Execute(buf, swaggerOpts)
-			html := buf.String()
-
-			e.GET(path.Join(basePath, subPath), func(c echo.Context) error {
-				return c.HTML(http.StatusOK, html)
-			})
+			html = buf.String()
 		}
 	}
 
-	return e.Start(address)
+	return func(next echo.HandlerFunc) echo.HandlerFunc {
+		return func(c echo.Context) error {
+			switch c.Path() {
+			case path.Join(config.BasePath, config.JSONName):
+				c.Response().Header().Set("Access-Control-Allow-Origin", "*")
+				return c.String(http.StatusOK, string(b))
+			case path.Join(config.BasePath, config.SubPath):
+				return c.HTML(http.StatusOK, html)
+			default:
+				return next(c)
+			}
+		}
+	}
+}
+
+func (c *Config) EnsureDefaults() {
+	if c.DocPath == "" {
+		c.DocPath = "./swagger.yml"
+	}
+
+	if c.BasePath == "" || !path.IsAbs(c.BasePath) {
+		c.BasePath = "/" + c.BasePath
+	}
+
+	if c.JSONName == "" {
+		c.JSONName = "swagger.json"
+	} else if path.Ext(c.JSONName) != ".json" {
+		panic(errors.New("JsonName must have .json extension."))
+	}
+
+	if c.Flavor == "" {
+		c.Flavor = "swagger"
+	} else if c.Flavor != "redoc" && c.Flavor != "swagger" {
+		panic(errors.New("Flavor must be redoc or swagger."))
+	}
+
+	if c.SubPath == "" {
+		c.SubPath = "docs"
+	}
 }
