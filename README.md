@@ -4,20 +4,7 @@ Easy Swagger UI for your [Echo](https://echo.labstack.com/) API
 ## Installation
 If you want to install echogger. 
 ```
-go get -u github.com/DEATH-TROOPER/echogger
-```
-Then you can see the echogger directory like this.
-```
-src
-├── github.com
-|    └── DEATH-TROOPER
-|         └── echogger
-|              ├── echogger.go
-|              └── templates.go
-└── echo-server
-     ├── main.go
-     └── swagger.yml
-     
+go get -u github.com/KimMachineGun/echogger
 ```
 
 ## Example
@@ -27,7 +14,7 @@ package main
 import (
 	"net/http"
 
-	"github.com/DEATH-TROOPER/echogger"
+	"github.com/KimMachineGun/echogger"
 
 	"github.com/labstack/echo"
 )
