@@ -14,21 +14,22 @@ import (
 	"github.com/labstack/echo"
 )
 
-type (
-	Config struct {
-		DocPath  string
-		BasePath string
-		Flavor   string
-		SubPath  string
-		JSONName string
-		NoUI     bool
-	}
-)
+// Config configures the echogger middlewares
+type Config struct {
+	DocPath  string
+	BasePath string
+	Flavor   string
+	SubPath  string
+	JSONName string
+	NoUI     bool
+}
 
+// Middleware creates a middleware to serve a documentation site
 func Middleware() echo.MiddlewareFunc {
 	return MiddlewareWithConfig(Config{})
 }
 
+// MiddlewareWithConfig creates a middleware with options to serve a documentation site
 func MiddlewareWithConfig(config Config) echo.MiddlewareFunc {
 	config.EnsureDefaults()
 
@@ -90,6 +91,7 @@ func MiddlewareWithConfig(config Config) echo.MiddlewareFunc {
 	}
 }
 
+// EnsureDefaults in case some options are missing
 func (c *Config) EnsureDefaults() {
 	if c.DocPath == "" {
 		c.DocPath = "./swagger.yml"
@@ -102,13 +104,13 @@ func (c *Config) EnsureDefaults() {
 	if c.JSONName == "" {
 		c.JSONName = "swagger.json"
 	} else if path.Ext(c.JSONName) != ".json" {
-		panic(errors.New("JsonName must have .json extension."))
+		panic(errors.New("JSONName must have .json extension"))
 	}
 
 	if c.Flavor == "" {
 		c.Flavor = "swagger"
 	} else if c.Flavor != "redoc" && c.Flavor != "swagger" {
-		panic(errors.New("Flavor must be redoc or swagger."))
+		panic(errors.New("Flavor must be redoc or swagger"))
 	}
 
 	if c.SubPath == "" {
