@@ -94,7 +94,7 @@ func MiddlewareWithConfig(config Config) echo.MiddlewareFunc {
 // EnsureDefaults in case some options are missing
 func (c *Config) EnsureDefaults() {
 	if c.DocPath == "" {
-		c.DocPath = "./swagger.yml"
+		c.DocPath = "./swagger.yaml"
 	}
 
 	if c.BasePath == "" || !path.IsAbs(c.BasePath) {

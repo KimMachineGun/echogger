@@ -28,7 +28,7 @@ func main() {
 		Flavor:   "swagger",
 		BasePath: "v1",
 		SubPath:  "document",
-		DocPath:  "./swagger.yml",
+		DocPath:  "./swagger.yaml",
 		JSONName: "spec.json",
 	}
 
@@ -49,7 +49,7 @@ If you use `echogger.Middleware()`, config is default value.
 >Flavor:   "swagger"
 >BasePath: "/"
 >SubPath:  "docs"
->DocPath:  "./swagger.yml"
+>DocPath:  "./swagger.yaml"
 >JSONName: "swagger.json"
 >```
 
