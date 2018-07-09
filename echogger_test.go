@@ -3,6 +3,7 @@ package echogger
 import (
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"path"
 	"testing"
 
@@ -66,9 +67,9 @@ func TestMiddlewareWithoutFile(t *testing.T) {
 	assert := assert.New(t)
 
 	defer func() {
-		if r := recover().(error); assert.Error(r) {
-			assert.Equal("open .\\swagger.yaml: The system cannot find the file specified.", r.Error())
-		}
+		_, ok := recover().(error).(*os.PathError)
+		assert.True(ok)
 	}()
+
 	Middleware()
 }
