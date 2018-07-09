@@ -1,4 +1,4 @@
-# echogger
+# echogger [![Build Status](https://travis-ci.org/KimMachineGun/echogger.svg?branch=master)](https://travis-ci.org/KimMachineGun/echogger)
 Easy Swagger UI for your [Echo](https://echo.labstack.com/) API
 
 ## Installation
