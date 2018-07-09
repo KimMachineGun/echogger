@@ -1,4 +1,4 @@
-# echogger [![Build Status](https://travis-ci.org/KimMachineGun/echogger.svg?branch=master)](https://travis-ci.org/KimMachineGun/echogger)
+# echogger [![Build Status](https://travis-ci.org/KimMachineGun/echogger.svg?branch=master)](https://travis-ci.org/KimMachineGun/echogger) [![Go Report Card](https://goreportcard.com/badge/github.com/KimMachineGun/echogger)](https://goreportcard.com/report/github.com/KimMachineGun/echogger)
 Easy Swagger UI for your [Echo](https://echo.labstack.com/) API
 
 ## Installation
