@@ -8,7 +8,7 @@ go get -u github.com/KimMachineGun/echogger
 ```
 
 ## Example
-```
+```go
 package main
 
 import (
