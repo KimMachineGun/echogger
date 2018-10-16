@@ -2,7 +2,6 @@
 Easy Swagger UI for your [Echo](https://echo.labstack.com/) API
 
 ## Installation
-If you want to install echogger. 
 ```
 go get -u github.com/KimMachineGun/echogger
 ```
